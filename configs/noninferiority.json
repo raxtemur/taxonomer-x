@@ -1,0 +1,140 @@
+{
+  "schema_version": "taxobranch.noninferiority.1",
+  "smoke_seed": 86,
+  "training": {
+    "encoder": "microsoft/deberta-v3-base",
+    "relation_objective": "typed",
+    "epochs": 3,
+    "early_stopping_patience": 2,
+    "early_stopping_min_delta": 0.0001,
+    "batch_size": 32,
+    "root_batch_size": 64,
+    "gradient_accumulation": 1,
+    "learning_rate": 2e-05,
+    "warmup_ratio": 0.06,
+    "precision": "auto"
+  },
+  "external_domains": [
+    "science",
+    "science_eurovoc",
+    "science_wordnet",
+    "environment_eurovoc",
+    "food",
+    "food_wordnet"
+  ],
+  "primary_domains": [
+    "science",
+    "science_eurovoc",
+    "environment_eurovoc",
+    "food"
+  ],
+  "value_of_computation": {
+    "base_k": 10,
+    "max_k": 20,
+    "pair_fraction": 0.75,
+    "ridge_l2": 0.1,
+    "edge_weight": 0.25,
+    "ancestor_weight": 1.0,
+    "cv_folds": 5,
+    "fit_split": "wordnet_node_disjoint_dev_only",
+    "target": "counterfactual_full_minus_base_per_node_edge_plus_ancestor_utility",
+    "combined_features": "neural_uncertainty_union_symbolic_conflict",
+    "symbolic_features_require_intermediate_exact_decode": false,
+    "finite_boundary_policy": "finite_self_sentinel_and_fail_closed_gate_fit",
+    "test_tuning": false
+  },
+  "systems": [
+    "fixed_k10",
+    "voc_combined",
+    "voc_neural",
+    "voc_symbolic",
+    "random",
+    "uniform_budget",
+    "full_k20"
+  ],
+  "equal_budget_systems": [
+    "voc_combined",
+    "voc_neural",
+    "voc_symbolic",
+    "random",
+    "uniform_budget"
+  ],
+  "resource_measurement": {
+    "batch_size": 256,
+    "repetitions": 3,
+    "order": "alternating_with_seed_and_repetition",
+    "estimator": "within_process_median",
+    "model_loads_per_seed": 1,
+    "reuse_last_full_score_tensor_for_all_control_metrics": true,
+    "report": [
+      "wall_seconds",
+      "gpu_seconds",
+      "pairs_scored",
+      "pairs_per_second",
+      "peak_cuda_allocated_bytes",
+      "peak_cuda_reserved_bytes"
+    ]
+  },
+  "noninferiority": {
+    "alpha_one_sided": 0.05,
+    "family": "two_coprimary_endpoints_both_must_pass",
+    "multiplicity": "intersection_union_no_alpha_adjustment",
+    "reference": "full_k20",
+    "candidate": "voc_combined",
+    "edge_f1_margin_points": 0.5,
+    "ancestor_f1_margin_points": 1.0,
+    "primary_test": "paired_student_t_lower_confidence_bound",
+    "sensitivity": "paired_retraining_bootstrap_lower_percentile_bound_100000_samples",
+    "success": "both_lower_bounds_strictly_greater_than_negative_margin",
+    "missing_retraining_policy": "wait_and_report_incomplete_never_analyze_subset"
+  },
+  "primary_endpoints": [
+    "macro4_edge_f1_voc_combined_minus_full_k20",
+    "macro4_ancestor_f1_voc_combined_minus_full_k20"
+  ],
+  "secondary_endpoints": [
+    "valid_rate",
+    "wall_seconds_ratio",
+    "gpu_seconds_ratio",
+    "pairs_ratio",
+    "combined_minus_equal_budget_controls"
+  ],
+  "reporting": {
+    "aggregation": "mean_and_sample_sd_across_thirty_independent_retrainings",
+    "bootstrap_samples": 100000,
+    "bootstrap_seed": 202731,
+    "report_all_prespecified_controls": true
+  },
+  "retraining_ids": [
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": "taxobranch.matched_objectives.1",
+  "retraining_ids": [
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126
+  ],
+  "objectives": [
+    "typed",
+    "balanced_binary",
+    "pairwise",
+    "listwise"
+  ],
+  "training": {
+    "objectives": [
+      "typed",
+      "balanced_binary",
+      "pairwise",
+      "listwise"
+    ],
+    "encoder": "microsoft/deberta-v3-base",
+    "epochs": 3,
+    "pair_encodings_per_epoch": 399228,
+    "pair_encodings_per_update": 102,
+    "optimizer_updates_per_epoch": 3914,
+    "batch_items": {
+      "typed": 102,
+      "balanced_binary": 102,
+      "pairwise": 51,
+      "listwise": 34
+    },
+    "listwise_negatives": 2,
+    "root_batch_size": 64,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.06,
+    "root_weight": 0.2,
+    "max_length": 192,
+    "precision": "auto",
+    "num_workers": 4,
+    "inference_batch_size": 256,
+    "smoke_seed": 52,
+    "smoke_pair_encodings": 204
+  },
+  "transfer_domains": [
+    "mag_cs",
+    "mag_psy",
+    "noun",
+    "verb"
+  ],
+  "audit": {
+    "same_backbone_candidates_decoder": true,
+    "test_labels_used_for_training_or_selection": false,
+    "all_objectives_reported": true
+  }
+}

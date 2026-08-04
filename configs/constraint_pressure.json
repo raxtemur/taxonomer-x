@@ -1,0 +1,42 @@
+{
+  "schema_version": "taxobranch.constraint_pressure.1",
+  "random_seed": 202741,
+  "graph_sizes": [
+    64,
+    128
+  ],
+  "cycle_lengths": [
+    2,
+    3,
+    5,
+    8
+  ],
+  "pressure_fractions": [
+    0.05,
+    0.1,
+    0.2,
+    0.35
+  ],
+  "conflict_modes": [
+    "disjoint",
+    "overlapping"
+  ],
+  "replications_per_cell": 20,
+  "candidate_distractors_per_child": 3,
+  "systems": [
+    "independent",
+    "greedy",
+    "minimal_edit",
+    "exact"
+  ],
+  "metrics": [
+    "valid_rate",
+    "additive_regret",
+    "choice_edits",
+    "semantic_edge_error",
+    "runtime_seconds"
+  ],
+  "labels_used_for_generation_only": true,
+  "real_benchmark_test_labels_used": false,
+  "primary_claim": "exact has zero objective regret and validity one; comparative semantic effects are diagnostic"
+}

@@ -1,0 +1,4 @@
+{"child":"animal","root_score":2.0,"candidates":[]}
+{"child":"dog","root_score":0.0,"candidates":[{"parent":"animal","score":3.0}]}
+{"child":"cat","root_score":0.0,"candidates":[{"parent":"animal","score":2.8}]}
+{"child":"poodle","root_score":0.0,"candidates":[{"parent":"dog","score":3.2},{"parent":"animal","score":1.1}]}

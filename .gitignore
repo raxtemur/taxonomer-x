@@ -1,0 +1,161 @@
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# patch/merge leftovers
+*.orig
+*.rej
+
+# Local fixture symlink; its target is environment-specific, never committed.
+/results/texeval2
+
+# Claude Code session state (locks, NFS junk, per-session tasks)
+.claude/*.lock
+.claude/.nfs*
+.claude/scheduled_tasks*.json
+
+# MLSpace job credentials (copied locally from long_context_training/hybrid_memory)
+scripts/jobs/job_server.env
+scripts/jobs/*.log
+scripts/jobs/state/
+
+# Experiment outputs — weights, logs, per-epoch metrics (regenerable)
+/experiments/
+logs/
+wandb/
+*.log
+
+# Data artifacts too large for git (keep manifests)
+data/pool_clean.jsonl
+data/pool_wn*.jsonl
+data/pool_taxollama_*.jsonl
+data/schemaorg_runs/
+data/taxollama/
+data/taxonomy_*.json
+data/proposals_*.jsonl
+data/v6_fits/bansal_test_gold.jsonl
+data/v6_fits/pool_clean_no_schemaorg.jsonl
+data/v9/pool_wn_clean_*.jsonl
+data/v9/schemaorg_val.jsonl
+data/v9/cache/
+data/v9_blacklist_sources/
+/data/
+
+# Downstream task inference data (regenerable from scripts/v9/prepare_*.py)
+data/v9/semeval_inference/
+data/v9/taxoenrich_inference/
+data/v9/lex_ent_inference/
+
+# Stage 2/3 inference artefacts (regenerable, large)
+results/v9_s2/proposals/
+results/v9_s2/cer/
+results/v9_s2_v2/proposals/
+results/v9_s2_v2/cer/
+results/v9_s3/proposals/
+results/v9_s3/ilp/
+results/v9_s4/ilp/
+
+# v9 Stage-1 wave 2 proposer top-K dumps (regenerable from per-seed checkpoints)
+results/v9_s1_v2/proposals_texeval/
+
+# v9 downstream per-seed predictions (regenerable from per-seed checkpoints + scripts/v9/run_*)
+results/v9_s5/T2_s*/
+results/v9_s6/T3_s*/
+results/v9_s7/T4_s*/
+
+# v8 phase sweeps (regenerable from scripts/jobs/submit_v8_*; keep summary.md/aggregate.json)
+results/v8_phase1/
+results/v8_sweep/
+
+# v3 batch-6 scaling sweep (paper-only, regenerable from scripts/jobs/submit_v3b6.py)
+results/v3b6/
+
+# v9 sweep state (job IDs / per-axis pointers, regenerable on resubmit)
+state/
+
+# Results — keep summary.md / index.json / metrics.json / coeffs.json / CI/sweep summaries; drop heavy per-domain dumps
+results/texeval2/*/taxonomy_*.json
+results/texeval2/*/proposals_*.jsonl
+results/texeval2/cosine/
+results/texeval2/_v6_roundtrip_tmp/
+results/v6_phase*/**/features_*.jsonl
+results/v6_phase*/**/proposals_*.jsonl
+results/v6_phase*/**/taxonomy_*.json
+results/v6_phase*/tau_sweep_*/tau*_taxonomy.json
+results/v6_phase*/*_val*/tau*_taxonomy.json
+results/bansal/**/proposals_*.jsonl
+results/bansal/**/taxonomy_*.json
+
+# Local scratch / IDE exports / notes
+Untitled
+govno.md
+chatgpt/
+cursor_documentation.md
+docs/plans/Untitled
+docs/plans/relaunch_eval_and_phase2_after_v9wn.txt
+
+.DS_Store
+
+# External baselines: third-party repos (TaxoLLaMA / Graph2Taxo / TaxoRL)
+external_baselines/
+
+# Heavy v9 data artefacts (regenerable from scripts/v9/build_*.py / def-cache builders)
+data/v9/def_caches/
+data/v9/pool_t3_phase2_*.jsonl
+data/v9_enriched/
+data/graph2taxo/
+
+# v9 Layer 3.C structural reranker — heavy per-seed dumps (keep aggregate.json + coeffs/)
+results/v9_s2_v3_struct/T1_s*/
+results/v9_s2_v3_struct/features_*/
+results/v9_s2_v3_struct/proposals_*/
+results/v9_s2_v3_struct/smoke_*/
+
+# v9 Layer 3.C v2 (CER+struct) — heavy per-seed dumps (keep coeffs/ + chain_logs/)
+results/v9_s2_v4_cerstruct/T1_s*/
+results/v9_s2_v4_cerstruct/features_*/
+results/v9_s2_v4_cerstruct/proposals_*/
+
+# v9 Layer 3.D multi-parent ILP — per-seed taxonomies (keep aggregate.json)
+results/v9_s3_v2_multiparent/T1_s*/
+results/v9_s3_v2_multiparent/smoke_*/
+results/v9_s3_v2_multiparent.protocol_bug/
+
+# v9 T1 paired-comparison heavy outputs (proposals/cer/features per seed; keep small aggregates)
+results/v9_t1_paired/bench_ours/
+results/v9_t1_paired/bench_ours_2/
+results/v9_t1_paired/E1_ours/
+results/v9_t1_paired/full_ours/
+
+# Public-release safety
+/artifacts/
+/release/
+/dist/
+/build/
+*.env
+.env
+.env.*
+*credentials*
+*secret*
+*.pem
+*.key
+
+# Model and tensor artifacts
+*.bin
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+
+# Generated machine-specific cluster submissions
+/scripts/jobs/site_*.sh
+
+# LaTeX build products (keep paper/main.pdf intentionally)
+/paper/*.aux
+/paper/*.bbl
+/paper/*.blg
+/paper/*.log
+/paper/*.out
+/paper/*.synctex.gz

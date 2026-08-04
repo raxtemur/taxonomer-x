@@ -1,0 +1,224 @@
+\section{Exact Selection Across Structural Families}
+\label{app:family-selection}
+
+The primary decoder fixes a feasible family and reports its constraint tension.
+Multiple inheritance raises a different question: does the
+available evidence justify changing the family itself?  We formalize that
+question for nested families.  Let $\mathcal F_0$ contain single-parent
+forests and let $\mathcal F_B\supseteq\mathcal F_0$ contain acyclic
+taxonomies with at most two parents per child and at most $B$ second-parent
+slots.  Write $A_s(y)$ for the unregularized additive evidence and
+$M(y)$ for the number of used second-parent slots.  Define
+\begin{align}
+ P_B(s)&=\max_{y\in\mathcal F_B} A_s(y),\\
+ R_B(s)&=P_B(s)-P_0(s),\label{eq:relaxation-value}\\
+ L_B(s)&=\max_{y\in\mathcal L_B} A_s(y),\\
+ T_B(s)&=L_B(s)-P_B(s).\label{eq:family-tension}
+\end{align}
+where $\mathcal L_B$ drops global acyclicity and budget coupling.
+$R_B$ is the \emph{relaxation value}: neural score recovered by enlarging
+the forest family. $T_B$ is the \emph{constraint tension}: score difference required
+to enforce the declared global constraints.  They answer different questions.
+
+Since $\mathcal F_0\subseteq\mathcal F_B\subseteq\mathcal L_B$,
+$T_B,R_B\geq0$ and the identity
+$L_B(s)-P_0(s)=T_B(s)+R_B(s)$ separates local evidence, global constraint
+tension, and the score value of multiple inheritance.
+
+Rather than report only two dev-selected thresholds, consider the complete
+regularization path
+\begin{align}
+ y_\lambda&\in\argmax_{y\in\mathcal F_B}
+ \{A_s(y)-\lambda M(y)\},\\
+ V(\lambda)&=A_s(y_\lambda)-\lambda M(y_\lambda).
+ \label{eq:family-path}
+\end{align}
+Positive $\lambda$ penalizes additional parents; negative $\lambda$ is an
+explicit structural subsidy and is reported as such.
+
+\begin{proposition}[Monotone structural path]
+For $\lambda_1<\lambda_2$ and arbitrary optimizers at the two values,
+$M(y_{\lambda_1})\geq M(y_{\lambda_2})$.  Moreover, $V(\lambda)$ is
+convex and piecewise linear with an active slope $-M(y_\lambda)$.
+\end{proposition}
+\begin{proof}
+Optimality at the two penalties gives
+$A(y_1)-\lambda_1M(y_1)\geq A(y_2)-\lambda_1M(y_2)$ and
+$A(y_2)-\lambda_2M(y_2)\geq A(y_1)-\lambda_2M(y_1)$.
+Adding yields
+$(\lambda_2-\lambda_1)(M(y_1)-M(y_2))\geq0$.
+The value is the pointwise maximum of finitely many affine functions.
+\end{proof}
+
+The implementation obtains exact breakpoints from the cardinality frontier
+$P_m=\max_{y:M(y)=m}A_s(y)$.  Cardinality $m$ is optimal precisely on
+\begin{equation}
+ \max_{j>m}\frac{P_j-P_m}{j-m}
+ \;\leq\lambda\leq\;
+ \min_{j<m}\frac{P_m-P_j}{m-j},
+ \label{eq:penalty-interval}
+\end{equation}
+when this interval is nonempty.  These intervals certify that a reported
+forest/DAG decision is not an artifact of a single threshold grid point.
+
+\paragraph{Family-stability radius.}
+Let $q(y)$ be the selected edge/ROOT indicator vector and let $y^*$ be the
+current optimum.  Let $\gamma_{\rm fam}$ be its objective gap to the best
+solution in the other family (forest versus any solution using a second
+parent), and let
+\begin{equation}
+ D=\max_{y\text{ in other family}}\|q(y^*)-q(y)\|_1.
+\end{equation}
+Then
+\begin{equation}
+ \rho_{\rm fam}=\gamma_{\rm fam}/D
+ \label{eq:family-radius}
+\end{equation}
+is a conservative family-stability radius: every perturbation
+$\|\Delta s\|_\infty<\rho_{\rm fam}$ preserves the selected family.
+Indeed, the score difference against every other-family solution decreases
+by at most $\|\Delta s\|_\infty D<\gamma_{\rm fam}$.
+Forced exclusion of a selected edge and forced inclusion of an unselected
+second-parent decision similarly give edge-necessity and inclusion gaps.
+
+\paragraph{A tractable ordered case.}
+If every candidate edge respects a fixed strict topological order, any subset
+is acyclic.  For each child, compute its best zero/one-parent value $b_c$ and
+best two-parent value $d_c$, then select the at most $B$ largest positive
+margins $d_c-b_c$.  This is globally exact because the budget is the only
+remaining cross-child constraint.  It costs
+$O(|E|+|V|\log|V|)$ for additive edge utilities, or
+$O(\sum_c k_c^2+|V|\log|V|)$ with arbitrary parent-pair potentials.
+The general cyclic candidate case retains the ILP decoder.
+
+\paragraph{Evidence model and failure attribution.}
+Raw single-parent ranking log-potentials are not variable-cardinality
+probabilities.  Our revised pipeline therefore fits edge log-odds on WordNet
+train, a child-level cardinality head, and a conditional parent-pair head.
+The pair head ranks pairs after the first-parent evidence is known, while the
+cardinality head decides whether the second slot is warranted.  WordNet dev
+is reserved for ROOT calibration and $\lambda$ selection; the hard cap is a
+predeclared structural limit rather than gold prevalence.
+
+Retrieval remains an independent ceiling.  Among the
+\MpOracleGoldChildren{} Macro4 multi-parent children, both gold parents occur
+in the frozen top-20 pool for only
+\MpOracleCompleteTwenty{} (\MpOracleCompleteTwentyRate\%) and in top-50 for
+\MpOracleCompleteFifty{} (\MpOracleCompleteFiftyRate\%).  Food contributes
+only \MpOracleFoodTwenty{} complete top-20 cases out of
+\MpOracleFoodGold{}.  We consequently report four stages separately:
+candidate-set coverage, cardinality detection, conditional second-parent
+ranking, and exact globally feasible decoding.
+
+\paragraph{Sealed semantic-pair follow-up.}
+After inspecting the hybrid-retrieval and pair-oracle outcomes, we froze a
+separate ten-seed follow-up; it cannot alter the primary branching or
+allocation claims.  It reuses the coverage-preserving hybrid top-50 pools and
+frozen 768-dimensional edge representations, requiring
+\PairTransformerForwards{} additional transformer forwards.  For each child,
+the scorer enumerates unordered pairs within the top-$q=20$ edge frontier and
+uses the symmetric representation
+\begin{equation}
+ [h_i+h_j,\ |h_i-h_j|,\ h_i\odot h_j,\ \phi_{ij}],
+\end{equation}
+where $h_i$ is a learned transformation of frozen edge evidence and $\phi_{ij}$
+contains symmetric scalar rank and score features.  The exact decoder sees
+only the top-ranked pair ($M=1$), so the neural component must select the pair
+and the symbolic component only enforces global DAG feasibility.
+
+\begin{table}[h]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrr}
+\toprule
+& \multicolumn{2}{c}{\ef} & \multicolumn{2}{c}{\af} & Pair R@1\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Scope & Hybrid & Sem.+margin & Hybrid & Sem.+margin & Scalar$\to$sem.\\
+\midrule
+Macro4 & \PairMacroFourBaselineEdge & \textbf{\PairMacroFourSemanticEdge} &
+\PairMacroFourBaselineAncestor & \textbf{\PairMacroFourSemanticAncestor} &
+\PairMacroFourScalarPairRecallOne$\rightarrow$\textbf{\PairMacroFourSemanticPairRecallOne}\\
+Macro6 & \PairMacroSixBaselineEdge & \textbf{\PairMacroSixSemanticEdge} &
+\PairMacroSixBaselineAncestor & \textbf{\PairMacroSixSemanticAncestor} &
+\PairMacroSixScalarPairRecallOne$\rightarrow$\textbf{\PairMacroSixSemanticPairRecallOne}\\
+\bottomrule
+\end{tabular}
+\caption{Post-outcome semantic parent-pair follow-up (mean percent, seeds
+67--76). Pair R@1 is conditional on both gold parents occurring in the frozen
+top-50 pool; its matched scalar control uses the same candidates and decoder.}
+\label{tab:semantic-pair-followup}
+\end{table}
+
+On Macro4, semantic shortlisting improves \ef{} by
+\PairMacroFourEdgeDelta{} points (95\% paired-seed bootstrap CI
+[\PairMacroFourEdgeLow, \PairMacroFourEdgeHigh], exact sign-flip
+$p=\PairMacroFourEdgeP$) and \af{} by \PairMacroFourAncestorDelta{} points
+([\PairMacroFourAncestorLow, \PairMacroFourAncestorHigh],
+$p=\PairMacroFourAncestorP$).  The edge effect is positive on
+\PairMacroFourEdgeWins/\PairSeeds{} seeds.  Against the matched scalar pair
+score, semantic pair recall@1 gains \PairMacroFourPairRecallDelta{} points
+([\PairMacroFourPairRecallLow, \PairMacroFourPairRecallHigh],
+$p=\PairMacroFourPairRecallP$).  Supporting Macro6 analysis shows
+\PairMacroSixEdgeDelta/\PairMacroSixAncestorDelta{} \ef/\af{} gains
+($p=\PairMacroSixEdgeP/\PairMacroSixAncestorP$) and a
+\PairMacroSixPairRecallDelta-point pair-recall gain
+($p=\PairMacroSixPairRecallP$).  Forest outputs are exactly unchanged, which
+localizes these gains to semantic restriction of the multi-parent feasible
+set.  Exact parent-set recovery is observed too rarely to support a positive
+claim; the follow-up therefore establishes improved pair ranking and global
+hierarchy reconstruction, not solved multiple inheritance.
+
+\paragraph{Confirmatory joint-set budget ablation.}
+We finally evaluate all predeclared pair frontiers with the joint
+ROOT/singleton/pair scorer on a separate sealed set of
+\JointSetSeeds{} seeds. A fixed frontier of $q=3$ scores only
+\JointQThreePairs{} unordered pairs per child, compared with
+\JointQFivePairs{} at $q=5$, \JointQTenPairs{} at $q=10$, and
+\JointAdaptivePairs{} under uncertainty-adaptive allocation.
+
+\begin{table}[h]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llrrrr}
+\toprule
+Retrieval & Frontier & Pairs/child & Exact-set F1 & \ef & \af\\
+\midrule
+Hybrid40 & $q=3$ & \JointQThreePairs & \textbf{\JointHybridQThreeExact} &
+\textbf{\JointHybridQThreeEdge} & \textbf{\JointHybridQThreeAncestor}\\
+& $q=5$ & \JointQFivePairs & \JointHybridQFiveExact &
+\JointHybridQFiveEdge & \JointHybridQFiveAncestor\\
+& $q=10$ & \JointQTenPairs & \JointHybridQTenExact &
+\JointHybridQTenEdge & \JointHybridQTenAncestor\\
+& adaptive & \JointAdaptivePairs & \JointHybridAdaptiveExact &
+\JointHybridAdaptiveEdge & \JointHybridAdaptiveAncestor\\
+\midrule
+Learned50 & $q=3$ & \JointQThreePairs & \textbf{\JointLearnedQThreeExact} &
+\textbf{\JointLearnedQThreeEdge} & \textbf{\JointLearnedQThreeAncestor}\\
+& $q=5$ & \JointQFivePairs & \JointLearnedQFiveExact &
+\JointLearnedQFiveEdge & \JointLearnedQFiveAncestor\\
+& $q=10$ & \JointQTenPairs & \JointLearnedQTenExact &
+\JointLearnedQTenEdge & \JointLearnedQTenAncestor\\
+& adaptive & \JointAdaptivePairs & \JointLearnedAdaptiveExact &
+\JointLearnedAdaptiveEdge & \JointLearnedAdaptiveAncestor\\
+\bottomrule
+\end{tabular}
+\caption{Confirmatory Macro4 joint-set budget ablation (mean percent, seeds
+77--86). Bold marks the best mean within each retrieval pool; all rows retain
+exact DAG feasibility.}
+\label{tab:joint-set-budget}
+\end{table}
+
+The smallest frontier has the best mean exact-set, edge, and ancestor F1 in
+both retrieval pools while reducing pair evaluation by
+\JointQThreeSavingAdaptive\% relative to adaptive allocation,
+\JointQThreeSavingQFive\% relative to $q=5$, and
+\JointQThreeSavingQTen\% relative to $q=10$. We interpret this as a
+descriptive efficiency result: wider pair enumeration provides no observed
+benefit once the joint scorer has identified the strongest local frontier.
+The preregistered exact-set contrast between Learned50+adaptive and
+Hybrid40+$q=5$ is \JointPrimaryCandidateExact{} versus
+\JointPrimaryReferenceExact{} F1 ($\Delta=\JointPrimaryExactDelta$ points,
+Holm $p=\JointPrimaryExactP$), so it does not support a claim of improved
+exact parent-set recovery.

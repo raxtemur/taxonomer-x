@@ -1,0 +1,23 @@
+\begin{tikzpicture}[
+  font=\sffamily\scriptsize,
+  node distance=4mm,
+  stage/.style={draw=#1!75!black, fill=#1!8, rounded corners=2pt,
+                minimum height=10mm, text width=24mm, align=center, line width=.55pt},
+  output/.style={draw=black!65, fill=black!3, rounded corners=2pt,
+                 minimum height=10mm, text width=26mm, align=center, line width=.55pt},
+  flow/.style={-{Latex[length=2mm]}, line width=.65pt, black!75},
+  note/.style={align=center, font=\sffamily\tiny, text=black!72}
+]
+\node[stage=gray] (retrieve) {Candidate retrieval\\ \textbf{available parents}};
+\node[stage=blue, right=of retrieve] (score) {Typed cross-encoder\\ \textbf{semantic evidence}};
+\node[stage=orange, right=of score] (allocate) {Budgeted allocation\\ \textbf{pairs to score}};
+\node[stage=teal, right=of allocate] (decode) {Exact branching\\ \textbf{feasible optimum}};
+\node[output, right=of decode] (output) {Taxonomy\\ \textbf{certificate + repair log}};
+\draw[flow] (retrieve) -- (score);
+\draw[flow] (score) -- (allocate);
+\draw[flow] (allocate) -- (decode);
+\draw[flow] (decode) -- (output);
+\node[note, below=2mm of score] {matched objectives};
+\node[note, below=2mm of allocate] {non-inferiority};
+\node[note, below=2mm of decode] {validity + optimality};
+\end{tikzpicture}

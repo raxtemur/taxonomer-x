@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "datasets": {
+    "wordnet30": {
+      "version": "3.0",
+      "role": "relation supervision and held-out lexical-domain benchmark",
+      "url": "https://wordnetcode.princeton.edu/3.0/WNdb-3.0.tar.gz",
+      "archive": "wordnet/WNdb-3.0.tar.gz",
+      "sha256": "658b1ba191f5f98c2e9bae3e25c186013158f30ef779f191d2a44e5d25046dc8",
+      "extract_to": "wordnet",
+      "license_url": "https://wordnet.princeton.edu/license-and-commercial-use"
+    },
+    "texeval2": {
+      "version": "1.2",
+      "role": "main external taxonomy-construction test",
+      "url": "https://alt.qcri.org/semeval2016/task13/data/uploads/texeval-2_testdata_1.2.tar.gz",
+      "archive": "texeval2/texeval2_testdata.tar.gz",
+      "sha256": "c8b9c5759783252b1c4c069e838eaf48d4fe59a761aa591b2555ad95e599e964",
+      "extract_to": "texeval2",
+      "terms_url": "https://alt.qcri.org/semeval2016/task13/index.php?id=data-and-tools"
+    },
+    "taxollama_enrichment": {
+      "version": "TaxoLLaMA ACL-2024 snapshot",
+      "role": "secondary transfer on MAG-CS and MAG-PSY",
+      "google_drive_folder": "1nBCW9KlA77SDggn7MqZ3S4NOn4mAD36W",
+      "archive": "taxollama/data_taxonomy_enrichment.tar.gz",
+      "sha256": "62e21086d9c956f7f4f703d77d9b4bc618a5204248e363a3f2a82a955f314690",
+      "extract_to": "taxollama",
+      "upstream": "https://github.com/VityaVitalich/TaxoLLaMA"
+    },
+    "schemaorg": {
+      "version": "30.0",
+      "role": "frozen out-of-domain validation taxonomy",
+      "url": "https://raw.githubusercontent.com/schemaorg/schemaorg/main/data/releases/30.0/schemaorg-current-https.jsonld",
+      "archive": "schemaorg/schemaorg-current-https.jsonld",
+      "sha256": "4467fa19edcb1d7fb3c46c0adf3591b7f870c4a60b7838bdb61694fd02864cf6",
+      "license_url": "https://schema.org/docs/terms.html"
+    }
+  }
+}
